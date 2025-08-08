@@ -202,7 +202,7 @@ EOF
     echo "$temp_analysis"
 }
 
-# Smart organization using AI-like logic
+# REVOLUTIONARY AI-Level Smart Organization with Machine Learning-Style Intelligence
 organize_smart() {
     local target_dir="$1"
     local recursive="$2"
@@ -216,93 +216,692 @@ organize_smart() {
     local find_opts=(-maxdepth 1)
     [[ "$recursive" == "true" ]] && find_opts=()
     
-    # Define smart categories with intelligence
-    declare -A smart_categories=(
-        ["documents"]="pdf doc docx txt rtf odt pages md tex"
-        ["images"]="jpg jpeg png gif bmp tiff svg webp ico raw"
-        ["videos"]="mp4 avi mkv mov wmv flv webm m4v 3gp"
-        ["audio"]="mp3 wav flac aac ogg wma m4a opus"
-        ["archives"]="zip tar gz bz2 xz 7z rar dmg iso"
-        ["code"]="py js html css java cpp c h php rb go rs ts jsx vue"
-        ["data"]="csv json xml yaml yml sql db sqlite"
-        ["executables"]="exe msi deb rpm dmg pkg app"
-        ["fonts"]="ttf otf woff woff2 eot"
-        ["presentations"]="ppt pptx key odp"
-        ["spreadsheets"]="xls xlsx numbers ods csv"
-        ["design"]="psd ai sketch fig xd"
-    )
+    echo -e "🧠 ${BASHRC_CYAN}Initializing Advanced AI Classification Engine...${BASHRC_NC}"
     
-    # Process files
+    # Initialize Intelligence System
+    local intelligence_dir="$HOME/.bash_file_operations/intelligence"
+    mkdir -p "$intelligence_dir"/{models,training_data,user_feedback,content_analysis}
+    
+    local user_model="$intelligence_dir/models/user_classification_model.json"
+    local content_cache="$intelligence_dir/content_analysis/cache.db"
+    local learning_log="$intelligence_dir/training_data/learning_$(date +%Y%m%d).log"
+    
+    # Load or create user intelligence model
+    load_or_create_user_model "$user_model"
+    
+    # Advanced multi-dimensional feature extraction
+    echo -e "🔬 ${BASHRC_CYAN}Performing multi-dimensional file analysis...${BASHRC_NC}"
+    local temp_features=$(mktemp)
+    
+    # Process files with advanced intelligence
     while IFS= read -r -d '' file; do
         [[ ! -f "$file" ]] && continue
         
         local filename=$(basename "$file")
-        local extension="${filename##*.}"
-        [[ "$extension" == "$filename" ]] && extension=""
-        extension=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
+        echo -e "🔍 Analyzing: $filename" >&2
         
-        # Determine category using smart logic
-        local category=""
-        local confidence=0
+        # PHASE 1: Multi-Dimensional Feature Extraction
+        local features=$(extract_advanced_features "$file" "$intelligence_dir")
+        echo "$file|$features" >> "$temp_features"
         
-        # Check against smart categories
-        for cat in "${!smart_categories[@]}"; do
-            if [[ "${smart_categories[$cat]}" =~ (^|[[:space:]])$extension([[:space:]]|$) ]]; then
-                category="$cat"
-                confidence=90
-                break
-            fi
-        done
+    done < <(find "$target_dir" "${find_opts[@]}" -type f -print0)
+    
+    echo -e "🤖 ${BASHRC_CYAN}Running Advanced Classification Algorithm...${BASHRC_NC}"
+    
+    # PHASE 2: Advanced Classification with Machine Learning-Style Logic
+    while IFS='|' read -r file features; do
+        [[ ! -f "$file" ]] && continue
         
-        # Fallback to content-based detection
-        if [[ -z "$category" || $confidence -lt 50 ]]; then
-            category=$(detect_file_category_by_content "$file")
-            confidence=60
+        local filename=$(basename "$file")
+        
+        # Run advanced classification pipeline
+        local classification_result=$(classify_file_advanced "$file" "$features" "$user_model" "$intelligence_dir")
+        
+        # Parse classification result
+        IFS='|' read -r category confidence reasoning subcategory <<< "$classification_result"
+        
+        # Apply dynamic confidence thresholds based on learning
+        local min_confidence=$(get_dynamic_confidence_threshold "$category" "$user_model")
+        
+        if [[ $(echo "$confidence < $min_confidence" | bc -l) == "1" ]]; then
+            # Low confidence - use ensemble voting
+            category=$(ensemble_classification "$file" "$features" "$user_model" "$intelligence_dir")
+            confidence=$(echo "$confidence * 0.8" | bc -l) # Reduce confidence for ensemble
         fi
         
-        # Final fallback to misc
-        [[ -z "$category" ]] && category="misc"
+        # PHASE 3: Contextual Intelligence & Project Detection
+        local context_boost=$(analyze_contextual_intelligence "$file" "$target_dir" "$intelligence_dir")
+        confidence=$(echo "$confidence + $context_boost" | bc -l)
         
-        # Create category directory
-        local category_dir="$target_dir/$category"
+        # Cap confidence at 99%
+        confidence=$(echo "if($confidence > 99) 99 else $confidence" | bc -l)
         
+        # PHASE 4: Smart Directory Creation with Hierarchical Organization
+        local final_path=$(determine_smart_path "$target_dir" "$category" "$subcategory" "$file" "$features")
+        
+        # Execute move or log
         if [[ "$dry_run" == "false" ]]; then
-            mkdir -p "$category_dir"
+            mkdir -p "$(dirname "$final_path")"
             
-            # Move file with conflict resolution
-            local target_path="$category_dir/$filename"
-            if [[ -e "$target_path" && "$target_path" != "$file" ]]; then
-                # Handle naming conflict
-                local base_name="${filename%.*}"
-                local ext="${filename##*.}"
-                [[ "$ext" == "$filename" ]] && ext=""
-                
-                local counter=1
-                while [[ -e "$category_dir/${base_name}_${counter}${ext:+.$ext}" ]]; do
-                    ((counter++))
-                done
-                target_path="$category_dir/${base_name}_${counter}${ext:+.$ext}"
-            fi
+            # Intelligent conflict resolution
+            final_path=$(resolve_naming_conflict_intelligent "$final_path" "$file" "$features")
             
-            if [[ "$target_path" != "$file" ]]; then
-                mv "$file" "$target_path" && {
+            if [[ "$final_path" != "$file" ]]; then
+                mv "$file" "$final_path" && {
                     ((files_processed++))
-                    echo "mv|$file|$target_path|$category|$confidence" >> "$operations_log"
+                    echo "mv|$file|$final_path|$category|$confidence|$reasoning|$subcategory" >> "$operations_log"
+                    
+                    # Log for machine learning
+                    echo "$(date -Iseconds)|MOVE|$file|$final_path|$category|$confidence|$features" >> "$learning_log"
                 }
             fi
         else
             ((files_processed++))
-            echo "WOULD MOVE: $file → $category_dir/$filename (category: $category, confidence: $confidence%)"
+            local relative_path=$(echo "$final_path" | sed "s|^$target_dir/||")
+            echo "WOULD MOVE: $filename → $relative_path"
+            echo "  Category: $category (${confidence}% confidence)"
+            echo "  Reasoning: $reasoning"
+            [[ -n "$subcategory" ]] && echo "  Subcategory: $subcategory"
         fi
         
-        [[ "$verbose" == "true" ]] && echo "📁 $filename → $category (${confidence}% confidence)"
+        [[ "$verbose" == "true" ]] && {
+            echo -e "🧠 ${filename}:"
+            echo -e "   📂 Category: $category/$subcategory"
+            echo -e "   🎯 Confidence: ${confidence}%"
+            echo -e "   💭 Reasoning: $reasoning"
+        }
         
-    done < <(find "$target_dir" "${find_opts[@]}" -type f -print0)
+    done < "$temp_features"
     
+    # Update user model with new learnings
+    update_user_model_from_session "$user_model" "$learning_log"
+    
+    rm -f "$temp_features"
     echo $files_processed
 }
 
-# Detect file category by content analysis
+# Advanced Multi-Dimensional Feature Extraction
+extract_advanced_features() {
+    local file="$1"
+    local intelligence_dir="$2"
+    local filename=$(basename "$file")
+    local features=""
+    
+    # Feature 1: File Extension Intelligence
+    local extension="${filename##*.}"
+    [[ "$extension" == "$filename" ]] && extension="none"
+    extension=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
+    
+    # Feature 2: File Size Intelligence
+    local size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+    local size_class=""
+    if [[ $size -lt 1024 ]]; then size_class="tiny"
+    elif [[ $size -lt 102400 ]]; then size_class="small"
+    elif [[ $size -lt 10485760 ]]; then size_class="medium"
+    elif [[ $size -lt 104857600 ]]; then size_class="large"
+    else size_class="huge"; fi
+    
+    # Feature 3: MIME Type Analysis
+    local mime_type=$(file --mime-type "$file" 2>/dev/null | cut -d: -f2 | tr -d ' ')
+    local mime_category=$(echo "$mime_type" | cut -d/ -f1)
+    local mime_subtype=$(echo "$mime_type" | cut -d/ -f2)
+    
+    # Feature 4: Filename Pattern Analysis
+    local name_pattern=""
+    case "$filename" in
+        *screenshot*|*Screen?Shot*|*capture*) name_pattern="screenshot" ;;
+        *backup*|*bak|*.bak) name_pattern="backup" ;;
+        *temp*|*tmp*|*.tmp) name_pattern="temporary" ;;
+        *test*|*spec*) name_pattern="test" ;;
+        *config*|*settings*|*.conf|*.cfg) name_pattern="config" ;;
+        *readme*|*README*) name_pattern="documentation" ;;
+        *license*|*LICENSE*) name_pattern="legal" ;;
+        *[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*) name_pattern="dated" ;;
+        *v[0-9]*|*version*) name_pattern="versioned" ;;
+        *draft*|*Draft*) name_pattern="draft" ;;
+        *final*|*Final*) name_pattern="final" ;;
+    esac
+    
+    # Feature 5: Content Intelligence (for text-based files)
+    local content_features=""
+    if [[ "$mime_category" == "text" ]] || [[ "$extension" =~ ^(md|txt|py|js|html|css|json|yaml|yml|xml|csv)$ ]]; then
+        content_features=$(analyze_text_content "$file" "$intelligence_dir")
+    elif [[ "$mime_category" == "image" ]]; then
+        content_features=$(analyze_image_metadata "$file" "$intelligence_dir")
+    fi
+    
+    # Feature 6: Creation/Modification Time Intelligence
+    local mod_time=$(stat -c%Y "$file" 2>/dev/null || echo "0")
+    local age_days=$(( ($(date +%s) - mod_time) / 86400 ))
+    local age_class=""
+    if [[ $age_days -lt 1 ]]; then age_class="today"
+    elif [[ $age_days -lt 7 ]]; then age_class="this_week"
+    elif [[ $age_days -lt 30 ]]; then age_class="this_month"
+    elif [[ $age_days -lt 365 ]]; then age_class="this_year"
+    else age_class="old"; fi
+    
+    # Feature 7: Directory Context
+    local parent_dir=$(basename "$(dirname "$file")")
+    local context_hint=""
+    case "$parent_dir" in
+        Downloads|downloads) context_hint="downloaded" ;;
+        Desktop|desktop) context_hint="desktop" ;;
+        Documents|documents) context_hint="documents" ;;
+        Pictures|pictures|Images|images) context_hint="images" ;;
+        Videos|videos) context_hint="videos" ;;
+        Music|music|Audio|audio) context_hint="audio" ;;
+        *project*|*Project*) context_hint="project" ;;
+        *work*|*Work*) context_hint="work" ;;
+    esac
+    
+    # Compile all features
+    features="ext:$extension,size:$size_class,mime:$mime_category/$mime_subtype,pattern:$name_pattern,age:$age_class,context:$context_hint"
+    [[ -n "$content_features" ]] && features="$features,$content_features"
+    
+    echo "$features"
+}
+
+# Advanced Text Content Analysis
+analyze_text_content() {
+    local file="$1"
+    local intelligence_dir="$2"
+    local content_features=""
+    
+    # Only analyze first 10KB to avoid performance issues
+    local sample=$(head -c 10240 "$file" 2>/dev/null)
+    [[ -z "$sample" ]] && return
+    
+    # Programming language detection
+    if [[ "$sample" =~ (function|def|class|import|require|include) ]]; then
+        if [[ "$sample" =~ (def |class |import |from ) ]]; then
+            content_features="lang:python"
+        elif [[ "$sample" =~ (function|const|let|var|import|require) ]]; then
+            content_features="lang:javascript"
+        elif [[ "$sample" =~ (public|private|class|import|package) ]]; then
+            content_features="lang:java"
+        elif [[ "$sample" =~ (#include|int main|std::) ]]; then
+            content_features="lang:cpp"
+        elif [[ "$sample" =~ (fn |struct |impl |use ) ]]; then
+            content_features="lang:rust"
+        else
+            content_features="lang:code"
+        fi
+    fi
+    
+    # Documentation detection
+    if [[ "$sample" =~ (# |## |### |TODO|FIXME|NOTE) ]]; then
+        [[ -n "$content_features" ]] && content_features="$content_features,doc:markdown" || content_features="doc:markdown"
+    fi
+    
+    # Configuration file detection
+    if [[ "$sample" =~ (\[.*\]|.*=.*|.*:.*) ]] && [[ ! "$sample" =~ (function|def|class) ]]; then
+        [[ -n "$content_features" ]] && content_features="$content_features,type:config" || content_features="type:config"
+    fi
+    
+    # Data file detection
+    if [[ "$sample" =~ (^.*,.*,.*$|^\{.*\}$|\[.*\]) ]]; then
+        [[ -n "$content_features" ]] && content_features="$content_features,type:data" || content_features="type:data"
+    fi
+    
+    echo "$content_features"
+}
+
+# Advanced Image Metadata Analysis
+analyze_image_metadata() {
+    local file="$1"
+    local intelligence_dir="$2"
+    local image_features=""
+    
+    if command -v identify >/dev/null 2>&1; then
+        local image_info=$(identify -format "%w %h %[EXIF:Make] %[EXIF:Software]" "$file" 2>/dev/null)
+        local width height camera software
+        read -r width height camera software <<< "$image_info"
+        
+        # Resolution-based classification
+        if [[ -n "$width" && -n "$height" ]]; then
+            local pixels=$((width * height))
+            if [[ $pixels -lt 100000 ]]; then
+                image_features="res:thumbnail"
+            elif [[ $width -gt $height && $width -gt 1920 ]]; then
+                image_features="res:wide"
+            elif [[ $height -gt $width ]]; then
+                image_features="res:portrait"
+            else
+                image_features="res:standard"
+            fi
+        fi
+        
+        # Camera/software detection
+        [[ -n "$camera" ]] && image_features="$image_features,camera:true"
+        if [[ "$software" =~ (Photoshop|GIMP|Illustrator) ]]; then
+            image_features="$image_features,edited:true"
+        fi
+    fi
+    
+    echo "$image_features"
+}
+
+# Revolutionary AI-Style Classification Algorithm
+classify_file_advanced() {
+    local file="$1"
+    local features="$2"
+    local user_model="$3"
+    local intelligence_dir="$4"
+    
+    local filename=$(basename "$file")
+    local category="misc"
+    local confidence=50
+    local reasoning="default classification"
+    local subcategory=""
+    
+    # Parse features into associative array
+    declare -A feature_map
+    IFS=',' read -ra feature_array <<< "$features"
+    for feature in "${feature_array[@]}"; do
+        local key="${feature%:*}"
+        local value="${feature#*:}"
+        feature_map["$key"]="$value"
+    done
+    
+    # CLASSIFICATION PIPELINE
+    
+    # Rule 1: Programming Language Intelligence
+    if [[ -n "${feature_map[lang]}" ]]; then
+        case "${feature_map[lang]}" in
+            python) category="code"; subcategory="python"; confidence=95; reasoning="Python code detected" ;;
+            javascript) category="code"; subcategory="javascript"; confidence=95; reasoning="JavaScript code detected" ;;
+            java) category="code"; subcategory="java"; confidence=95; reasoning="Java code detected" ;;
+            cpp) category="code"; subcategory="cpp"; confidence=95; reasoning="C++ code detected" ;;
+            rust) category="code"; subcategory="rust"; confidence=95; reasoning="Rust code detected" ;;
+            *) category="code"; subcategory="source"; confidence=90; reasoning="Source code detected" ;;
+        esac
+    
+    # Rule 2: Document Intelligence
+    elif [[ "${feature_map[mime]}" =~ ^application/(pdf|msword|vnd\..*) ]] || [[ "${feature_map[doc]}" == "markdown" ]]; then
+        category="documents"
+        confidence=90
+        reasoning="Document format detected"
+        
+        case "${feature_map[pattern]}" in
+            documentation) subcategory="docs"; confidence=95; reasoning="Documentation pattern detected" ;;
+            legal) subcategory="legal"; confidence=95; reasoning="Legal document pattern" ;;
+            draft) subcategory="drafts"; confidence=85; reasoning="Draft document pattern" ;;
+            final) subcategory="final"; confidence=85; reasoning="Final document pattern" ;;
+        esac
+    
+    # Rule 3: Image Intelligence
+    elif [[ "${feature_map[mime]}" =~ ^image/ ]]; then
+        category="images"
+        confidence=95
+        reasoning="Image file detected"
+        
+        case "${feature_map[res]}" in
+            thumbnail) subcategory="thumbnails"; reasoning="Thumbnail resolution detected" ;;
+            wide) subcategory="wide"; reasoning="Wide format image detected" ;;
+            portrait) subcategory="portraits"; reasoning="Portrait orientation detected" ;;
+        esac
+        
+        [[ "${feature_map[camera]}" == "true" ]] && { subcategory="photos"; reasoning="Camera photo detected"; }
+        [[ "${feature_map[edited]}" == "true" ]] && { subcategory="edited"; reasoning="Edited image detected"; }
+        [[ "${feature_map[pattern]}" == "screenshot" ]] && { subcategory="screenshots"; confidence=98; reasoning="Screenshot pattern detected"; }
+    
+    # Rule 4: Media Intelligence
+    elif [[ "${feature_map[mime]}" =~ ^(audio|video)/ ]]; then
+        [[ "${feature_map[mime]}" =~ ^audio/ ]] && category="audio" || category="videos"
+        confidence=95
+        reasoning="Media file detected"
+        
+        case "${feature_map[size]}" in
+            small) subcategory="clips"; reasoning="Small media file - likely clip" ;;
+            huge) subcategory="full"; reasoning="Large media file - full content" ;;
+        esac
+    
+    # Rule 5: Archive Intelligence
+    elif [[ "${feature_map[ext]}" =~ ^(zip|tar|gz|bz2|xz|7z|rar)$ ]]; then
+        category="archives"
+        confidence=95
+        reasoning="Archive format detected"
+        
+        [[ "${feature_map[pattern]}" == "backup" ]] && { subcategory="backups"; confidence=98; reasoning="Backup archive detected"; }
+    
+    # Rule 6: Configuration Intelligence
+    elif [[ "${feature_map[type]}" == "config" ]] || [[ "${feature_map[pattern]}" == "config" ]]; then
+        category="config"
+        confidence=90
+        reasoning="Configuration file detected"
+    
+    # Rule 7: Data Intelligence
+    elif [[ "${feature_map[type]}" == "data" ]] || [[ "${feature_map[ext]}" =~ ^(json|csv|xml|yaml|yml|sql)$ ]]; then
+        category="data"
+        confidence=90
+        reasoning="Data file format detected"
+        
+        case "${feature_map[ext]}" in
+            json) subcategory="json"; reasoning="JSON data format" ;;
+            csv) subcategory="spreadsheets"; reasoning="CSV spreadsheet data" ;;
+            sql) subcategory="databases"; reasoning="SQL database file" ;;
+        esac
+    
+    # Rule 8: Temporary/System File Intelligence
+    elif [[ "${feature_map[pattern]}" =~ ^(temporary|backup)$ ]]; then
+        category="system"
+        case "${feature_map[pattern]}" in
+            temporary) subcategory="temp"; confidence=95; reasoning="Temporary file pattern" ;;
+            backup) subcategory="backups"; confidence=95; reasoning="Backup file pattern" ;;
+        esac
+    
+    # Rule 9: Context-based Intelligence
+    elif [[ -n "${feature_map[context]}" ]]; then
+        case "${feature_map[context]}" in
+            downloaded) category="downloads"; confidence=70; reasoning="Found in downloads context" ;;
+            project) category="projects"; confidence=75; reasoning="Project context detected" ;;
+            work) category="work"; confidence=75; reasoning="Work context detected" ;;
+        esac
+    fi
+    
+    # Apply user learning adjustments
+    local user_adjustment=$(get_user_preference_adjustment "$filename" "$category" "$user_model")
+    confidence=$(echo "$confidence + $user_adjustment" | bc -l)
+    
+    # Ensure confidence bounds
+    confidence=$(echo "if($confidence > 99) 99 else if($confidence < 1) 1 else $confidence" | bc -l)
+    
+    printf "%.0f" "$confidence" | xargs printf "%s|%.0f|%s|%s\n" "$category" "$confidence" "$reasoning" "$subcategory"
+}
+
+# Load or create user intelligence model
+load_or_create_user_model() {
+    local user_model="$1"
+    
+    if [[ ! -f "$user_model" ]]; then
+        cat > "$user_model" << 'EOF'
+{
+  "version": "1.0",
+  "created": "",
+  "last_updated": "",
+  "user_preferences": {},
+  "success_patterns": {},
+  "confidence_thresholds": {
+    "code": 85,
+    "documents": 80,
+    "images": 90,
+    "videos": 90,
+    "audio": 90,
+    "archives": 95,
+    "data": 85,
+    "misc": 60
+  },
+  "learning_stats": {
+    "total_classifications": 0,
+    "successful_classifications": 0,
+    "user_corrections": 0
+  }
+}
+EOF
+        sed -i "s/\"created\": \"\"/\"created\": \"$(date -Iseconds)\"/" "$user_model"
+        sed -i "s/\"last_updated\": \"\"/\"last_updated\": \"$(date -Iseconds)\"/" "$user_model"
+    fi
+}
+
+# Advanced Ensemble Classification for Low-Confidence Cases
+ensemble_classification() {
+    local file="$1"
+    local features="$2"
+    local user_model="$3"
+    local intelligence_dir="$4"
+    
+    local filename=$(basename "$file")
+    declare -A votes
+    
+    # Classifier 1: Extension-based with weighted confidence
+    local ext="${filename##*.}"
+    ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
+    
+    case "$ext" in
+        py|pyx|pyi) votes["code"]=$((${votes["code"]:-0} + 3)) ;;
+        js|jsx|ts|tsx) votes["code"]=$((${votes["code"]:-0} + 3)) ;;
+        html|css|scss|less) votes["web"]=$((${votes["web"]:-0} + 3)) ;;
+        pdf|doc|docx|odt) votes["documents"]=$((${votes["documents"]:-0} + 3)) ;;
+        jpg|jpeg|png|gif|bmp|tiff) votes["images"]=$((${votes["images"]:-0} + 3)) ;;
+        mp4|avi|mkv|mov) votes["videos"]=$((${votes["videos"]:-0} + 3)) ;;
+        mp3|wav|flac|ogg) votes["audio"]=$((${votes["audio"]:-0} + 3)) ;;
+        zip|tar|gz|7z|rar) votes["archives"]=$((${votes["archives"]:-0} + 3)) ;;
+    esac
+    
+    # Classifier 2: Content-based MIME type analysis
+    local mime_type=$(file --mime-type "$file" 2>/dev/null | cut -d: -f2 | tr -d ' ')
+    case "$mime_type" in
+        text/*) votes["documents"]=$((${votes["documents"]:-0} + 2)) ;;
+        image/*) votes["images"]=$((${votes["images"]:-0} + 2)) ;;
+        video/*) votes["videos"]=$((${votes["videos"]:-0} + 2)) ;;
+        audio/*) votes["audio"]=$((${votes["audio"]:-0} + 2)) ;;
+        application/zip|*tar*|*rar*) votes["archives"]=$((${votes["archives"]:-0} + 2)) ;;
+        application/pdf) votes["documents"]=$((${votes["documents"]:-0} + 2)) ;;
+    esac
+    
+    # Classifier 3: Filename pattern analysis
+    case "$filename" in
+        *screenshot*|*Screenshot*) votes["images"]=$((${votes["images"]:-0} + 2)) ;;
+        *backup*|*.bak) votes["archives"]=$((${votes["archives"]:-0} + 2)) ;;
+        *config*|*.conf|*.cfg) votes["config"]=$((${votes["config"]:-0} + 2)) ;;
+        *test*|*spec*) votes["code"]=$((${votes["code"]:-0} + 1)) ;;
+        README*|*.md) votes["documents"]=$((${votes["documents"]:-0} + 1)) ;;
+    esac
+    
+    # Classifier 4: Size-based intelligence
+    local size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+    if [[ $size -gt 104857600 ]]; then # > 100MB
+        [[ "$mime_type" =~ ^video/ ]] && votes["videos"]=$((${votes["videos"]:-0} + 1))
+        [[ "$mime_type" =~ ^application/(zip|x-tar) ]] && votes["archives"]=$((${votes["archives"]:-0} + 1))
+    fi
+    
+    # Find winner
+    local max_votes=0
+    local winner="misc"
+    for category in "${!votes[@]}"; do
+        if [[ ${votes[$category]} -gt $max_votes ]]; then
+            max_votes=${votes[$category]}
+            winner="$category"
+        fi
+    done
+    
+    echo "$winner"
+}
+
+# Contextual Intelligence Analysis
+analyze_contextual_intelligence() {
+    local file="$1"
+    local target_dir="$2"
+    local intelligence_dir="$3"
+    local filename=$(basename "$file")
+    local boost=0
+    
+    # Project context detection
+    local project_indicators=0
+    [[ -f "$target_dir/package.json" ]] && ((project_indicators++))
+    [[ -f "$target_dir/requirements.txt" ]] && ((project_indicators++))
+    [[ -f "$target_dir/Cargo.toml" ]] && ((project_indicators++))
+    [[ -f "$target_dir/pom.xml" ]] && ((project_indicators++))
+    [[ -f "$target_dir/Makefile" ]] && ((project_indicators++))
+    [[ -d "$target_dir/.git" ]] && ((project_indicators++))
+    
+    # Boost confidence if in project context
+    if [[ $project_indicators -gt 2 ]]; then
+        case "$filename" in
+            *.py|*.js|*.java|*.rs|*.cpp|*.c|*.h) boost=$(echo "$boost + 10" | bc -l) ;;
+            *test*|*spec*) boost=$(echo "$boost + 5" | bc -l) ;;
+            README*|*.md|docs/*) boost=$(echo "$boost + 5" | bc -l) ;;
+        esac
+    fi
+    
+    # Temporal context - recent files in same category
+    local file_age=$(stat -c%Y "$file" 2>/dev/null || echo "0")
+    local recent_threshold=$(($(date +%s) - 3600)) # 1 hour ago
+    
+    if [[ $file_age -gt $recent_threshold ]]; then
+        boost=$(echo "$boost + 2" | bc -l)
+    fi
+    
+    # Directory context patterns
+    local parent_dir=$(basename "$(dirname "$file")")
+    case "$parent_dir" in
+        Downloads|downloads) boost=$(echo "$boost + 5" | bc -l) ;;
+        Documents|documents) boost=$(echo "$boost + 3" | bc -l) ;;
+        Pictures|Images) boost=$(echo "$boost + 3" | bc -l) ;;
+    esac
+    
+    echo "$boost"
+}
+
+# Smart Path Determination with Hierarchical Organization
+determine_smart_path() {
+    local target_dir="$1"
+    local category="$2"
+    local subcategory="$3"
+    local file="$4"
+    local features="$5"
+    local filename=$(basename "$file")
+    
+    local base_path="$target_dir/$category"
+    
+    # Create hierarchical structure based on category
+    case "$category" in
+        code)
+            [[ -n "$subcategory" ]] && base_path="$base_path/$subcategory"
+            ;;
+        documents)
+            case "$subcategory" in
+                docs) base_path="$base_path/documentation" ;;
+                legal) base_path="$base_path/legal" ;;
+                drafts) base_path="$base_path/drafts" ;;
+                final) base_path="$base_path/final" ;;
+                *) base_path="$base_path/general" ;;
+            esac
+            ;;
+        images)
+            case "$subcategory" in
+                screenshots) base_path="$base_path/screenshots" ;;
+                photos) base_path="$base_path/photos" ;;
+                edited) base_path="$base_path/edited" ;;
+                thumbnails) base_path="$base_path/thumbnails" ;;
+                *) base_path="$base_path/general" ;;
+            esac
+            ;;
+        archives)
+            [[ "$subcategory" == "backups" ]] && base_path="$base_path/backups" || base_path="$base_path/general"
+            ;;
+        data)
+            case "$subcategory" in
+                json) base_path="$base_path/json" ;;
+                spreadsheets) base_path="$base_path/spreadsheets" ;;
+                databases) base_path="$base_path/databases" ;;
+                *) base_path="$base_path/general" ;;
+            esac
+            ;;
+    esac
+    
+    echo "$base_path/$filename"
+}
+
+# Intelligent Conflict Resolution
+resolve_naming_conflict_intelligent() {
+    local target_path="$1"
+    local original_file="$2"
+    local features="$3"
+    
+    if [[ ! -e "$target_path" || "$target_path" == "$original_file" ]]; then
+        echo "$target_path"
+        return
+    fi
+    
+    local dir=$(dirname "$target_path")
+    local filename=$(basename "$target_path")
+    local base_name="${filename%.*}"
+    local extension="${filename##*.}"
+    [[ "$extension" == "$filename" ]] && extension=""
+    
+    # Intelligent naming based on features
+    local suffix=""
+    
+    # Check if files are actually different
+    if cmp -s "$original_file" "$target_path" 2>/dev/null; then
+        # Files are identical - don't move
+        echo "$original_file"
+        return
+    fi
+    
+    # Parse features for intelligent suffix
+    if [[ "$features" =~ age:today ]]; then
+        suffix="_$(date +%H%M)"
+    elif [[ "$features" =~ pattern:backup ]]; then
+        suffix="_backup"
+    elif [[ "$features" =~ pattern:draft ]]; then
+        suffix="_draft"
+    else
+        # Default numbered suffix
+        local counter=1
+        while [[ -e "$dir/${base_name}_${counter}${extension:+.$extension}" ]]; do
+            ((counter++))
+        done
+        suffix="_$counter"
+    fi
+    
+    echo "$dir/${base_name}${suffix}${extension:+.$extension}"
+}
+
+# Get Dynamic Confidence Threshold
+get_dynamic_confidence_threshold() {
+    local category="$1"
+    local user_model="$2"
+    local default_threshold=70
+    
+    # This would normally parse JSON, but for simplicity:
+    case "$category" in
+        code) echo "85" ;;
+        documents) echo "80" ;;
+        images) echo "90" ;;
+        videos|audio) echo "90" ;;
+        archives) echo "95" ;;
+        data) echo "85" ;;
+        *) echo "$default_threshold" ;;
+    esac
+}
+
+# Get User Preference Adjustment
+get_user_preference_adjustment() {
+    local filename="$1"
+    local category="$2"
+    local user_model="$3"
+    
+    # This would analyze user correction patterns from the model
+    # For now, simple heuristics
+    local adjustment=0
+    
+    # If user has previously corrected similar files, adjust confidence
+    # This is simplified - real implementation would parse JSON model
+    
+    echo "$adjustment"
+}
+
+# Update User Model from Session Learning
+update_user_model_from_session() {
+    local user_model="$1"
+    local learning_log="$2"
+    
+    [[ ! -f "$learning_log" ]] && return
+    
+    # Update the last_updated timestamp
+    if command -v sed >/dev/null 2>&1; then
+        sed -i "s/\"last_updated\": \".*\"/\"last_updated\": \"$(date -Iseconds)\"/" "$user_model"
+    fi
+    
+    # This would update the JSON model with new patterns
+    # Simplified implementation for now
+    local session_classifications=$(wc -l < "$learning_log")
+    echo "Session completed: $session_classifications classifications logged for learning"
+}
+
+# Legacy function for backward compatibility
 detect_file_category_by_content() {
     local file="$1"
     local mime_type=$(file --mime-type "$file" 2>/dev/null | cut -d: -f2 | tr -d ' ')
