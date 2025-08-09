@@ -1,1 +1,1 @@
-# Ultimate-BashRC-Ecosystem-
+# Ultimate-BashRC-Ecosystem
