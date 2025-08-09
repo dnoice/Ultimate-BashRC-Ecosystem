@@ -281,13 +281,19 @@ install_modules() {
     if [[ -f "./01_core-settings.sh" ]]; then
         print_info "Installing from local directory..."
         
-        # Copy module files
+        # Copy module files (including hidden gems if present)
         for module in *.sh; do
             if [[ "$module" =~ ^[0-9]{2}_.+\.sh$ ]]; then
                 cp "$module" "$INSTALL_DIR/modules/"
-                print_success "Installed module: $module"
+                # Don't announce hidden modules
+                if [[ ! "$module" =~ ^(11|12)_ ]]; then
+                    print_success "Installed module: $module"
+                fi
             fi
         done
+        
+        # Silently copy easter eggs if present
+        [[ -f ".easter_eggs.sh" ]] && cp ".easter_eggs.sh" "$INSTALL_DIR/" 2>/dev/null
         
         # Copy additional files
         [[ -f "README.md" ]] && cp "README.md" "$INSTALL_DIR/"
