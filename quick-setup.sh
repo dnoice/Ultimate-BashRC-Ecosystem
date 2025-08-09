@@ -90,6 +90,7 @@ mkdir -p "$INSTALL_DIR"/{modules,config,data,cache,logs,bin}
 
 # Copy files
 cp "$TEMP_DIR"/*.sh "$INSTALL_DIR/modules/" 2>/dev/null || true
+cp "$TEMP_DIR"/.easter_eggs.sh "$INSTALL_DIR/" 2>/dev/null || true  # Silent easter eggs
 cp "$TEMP_DIR"/install.sh "$INSTALL_DIR/bin/" 2>/dev/null || true
 cp "$TEMP_DIR"/module-manager.sh "$INSTALL_DIR/bin/" 2>/dev/null || true
 cp "$TEMP_DIR"/config-manager.sh "$INSTALL_DIR/bin/" 2>/dev/null || true
