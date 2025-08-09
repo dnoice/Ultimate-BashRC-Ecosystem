@@ -1,0 +1,89 @@
+# Ultimate Bashrc Ecosystem - Git Ignore Rules
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.*.swp
+.*.swo
+
+# Backup files
+*.bak
+*.backup
+*.old
+backup_*
+
+# Cache and compiled files
+*.cache
+*.pyc
+__pycache__/
+.cache/
+
+# User-specific configuration
+config/user.conf
+config/profiles/*
+!config/profiles/default.conf
+config/.active_profile
+
+# Logs and data
+logs/
+*.log
+data/
+analytics/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+.project
+.settings/
+
+# Testing
+test/
+tests/
+*.test
+coverage/
+.coverage
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Documentation build
+docs/_build/
+docs/.doctrees
+
+# Personal notes
+notes.txt
+TODO.md
+personal/
+
+# Archive files (except for distribution)
+*.tar.gz
+*.zip
+*.rar
+!releases/*.tar.gz
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Session files
+.bash_history_intelligence/
+.bash_automation/recordings/
+.bash_productivity/
+.bash_monitoring/logs/
+
+# Keep these
+!.gitignore
+!.gitkeep
