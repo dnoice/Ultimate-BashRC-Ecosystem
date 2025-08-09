@@ -191,6 +191,21 @@ load_all_modules() {
         "Python Development:10_python-development.sh:LOAD_PYTHON_DEVELOPMENT"
     )
     
+    # 🤫 Check for hidden gems (silent loading)
+    if [[ -f "$ULTIMATE_BASHRC_MODULES_DIR/11_secret-assistant.sh" ]]; then
+        # Only load if discovered or explicitly enabled
+        if [[ -f "$HOME/.ultimate-bashrc/.assistant_discovered" ]] || [[ "$LOAD_SECRET_ASSISTANT" == "true" ]]; then
+            modules+=("Secret Assistant:11_secret-assistant.sh:LOAD_SECRET_ASSISTANT")
+        fi
+    fi
+    
+    if [[ -f "$ULTIMATE_BASHRC_MODULES_DIR/12_stealth-mode.sh" ]]; then
+        # Only load if discovered or explicitly enabled  
+        if [[ -f "$HOME/.ultimate-bashrc/.stealth_discovered" ]] || [[ "$LOAD_STEALTH_MODE" == "true" ]]; then
+            modules+=("Stealth Mode:12_stealth-mode.sh:LOAD_STEALTH_MODE")
+        fi
+    }
+    
     # Load modules based on configuration
     local loaded_count=0
     local failed_count=0
@@ -403,6 +418,10 @@ For module-specific help, use:
   sysmon help               # System monitoring help
   ... and more
 
+${BASHRC_YELLOW}💡 Hint: This ecosystem rewards exploration...${BASHRC_NC}
+${BASHRC_YELLOW}   Some features are hidden until discovered.${BASHRC_NC}
+${BASHRC_YELLOW}   Try using 'ultimate' frequently! 🥚${BASHRC_NC}
+
 EOF
 }
 
@@ -478,6 +497,11 @@ initialize_ultimate_bashrc() {
     
     # Export main command
     export -f ultimate ultimate_help ultimate_reload ultimate_status
+    
+    # 🥚 Load easter eggs system if present (silent)
+    if [[ -f "$ULTIMATE_BASHRC_HOME/.easter_eggs.sh" ]]; then
+        source "$ULTIMATE_BASHRC_HOME/.easter_eggs.sh" 2>/dev/null
+    fi
 }
 
 # Run initialization
